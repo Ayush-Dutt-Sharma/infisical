@@ -2,6 +2,7 @@ import { Modal, ModalContent } from "@app/components/v2";
 import { UsePopUpState } from "@app/hooks/usePopUp";
 import { ShareSecretForm } from "@app/views/ShareSecretPublicPage/components";
 
+
 type Props = {
   popUp: UsePopUpState<["createSharedSecret"]>;
   handlePopUpToggle: (

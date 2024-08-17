@@ -17,7 +17,8 @@ import {
   faMagnifyingGlass,
   faMinusSquare,
   faPlus,
-  faTrash
+  faTrash,
+  faKey
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import FileSaver from "file-saver";
@@ -67,6 +68,7 @@ import { CreateDynamicSecretForm } from "./CreateDynamicSecretForm";
 import { CreateSecretImportForm } from "./CreateSecretImportForm";
 import { FolderForm } from "./FolderForm";
 import { MoveSecretsModal } from "./MoveSecretsModal";
+import {MultipleShareSecretModal} from "../../../ShareSecretPage/components/MultipleShareSecretModal"
 
 type Props = {
   secrets?: SecretV3RawSanitized[];
@@ -106,6 +108,7 @@ export const ActionBar = ({
   onClickRollbackMode
 }: Props) => {
   const { handlePopUpOpen, handlePopUpToggle, handlePopUpClose, popUp } = usePopUp([
+    "shareMultiSecrets",
     "addFolder",
     "addDynamicSecret",
     "addSecretImport",
@@ -153,6 +156,28 @@ export const ActionBar = ({
         type: "error",
         text: "Failed to create folder"
       });
+    }
+  };
+
+  const handleMultiShareSecrets = () => {
+    try {
+      const secretsToMove = secrets.filter(({ id }) => Boolean(selectedSecrets?.[id]));
+
+  console.log('Selectedsecrets',secretsToMove)
+return secretsToMove
+      // let notificationMessage = "";
+      // let notificationType: TypeOptions = "info";
+
+
+
+      // createNotification({
+      //   type: notificationType,
+      //   text: notificationMessage
+      // });
+
+      // resetSelectedSecret();
+    } catch (error) {
+      console.error(error);
     }
   };
 
@@ -513,13 +538,32 @@ export const ActionBar = ({
             I={ProjectPermissionActions.Delete}
             a={subject(ProjectPermissionSub.Secrets, { environment, secretPath })}
             renderTooltip
+            allowedLabel="Share Secrets"
+          >
+            {(isAllowed) => (
+              <Button
+                variant="outline_bg"
+                leftIcon={<FontAwesomeIcon icon={faKey} />}
+                className="ml-4"
+                onClick={() => handlePopUpOpen("shareMultiSecrets")}
+                isDisabled={!isAllowed}
+                size="xs"
+              >
+                Share Secrets
+              </Button>
+            )}
+          </ProjectPermissionCan>
+          <ProjectPermissionCan
+            I={ProjectPermissionActions.Delete}
+            a={subject(ProjectPermissionSub.Secrets, { environment, secretPath })}
+            renderTooltip
             allowedLabel="Move"
           >
             {(isAllowed) => (
               <Button
                 variant="outline_bg"
                 leftIcon={<FontAwesomeIcon icon={faAnglesRight} />}
-                className="ml-4"
+                className="ml-2"
                 onClick={() => handlePopUpOpen("moveSecrets")}
                 isDisabled={!isAllowed}
                 size="xs"
@@ -587,6 +631,7 @@ export const ActionBar = ({
         handlePopUpToggle={handlePopUpToggle}
         onMoveApproved={handleSecretsMove}
       />
+      <MultipleShareSecretModal popUp={popUp} handlePopUpToggle={handlePopUpToggle} onShareSecretsClick={handleMultiShareSecrets}/>
       {subscription && (
         <UpgradePlanModal
           isOpen={popUp.upgradePlan.isOpen}
