@@ -33,7 +33,7 @@ const viewLimitOptions = [
 
 const secretSchema = z.object({
     key: z.string(),
-    secret: z.string().min(1, "Secret is required")
+    value: z.string().min(1, "Secret is required")
   });
   
   const schema = z.object({
@@ -135,9 +135,15 @@ export const MultiShareSecretsForm = ({ isPublic, secrets }: Props) => {
   };
 
   const hasSecretLink = Boolean(secretLink);
-
+  const onInvalid = (errs:unknown)=> {
+    createNotification({
+      text: "Failed to create a shared secret",
+      type: "error"
+    });
+    console.log('onInvalid',errs,errors)
+  }
   return !hasSecretLink ? (
-    <form onSubmit={handleSubmit(onFormSubmit)}>
+    <form onSubmit={handleSubmit(onFormSubmit,onInvalid)}>
      <table className="w-full border-collapse">
         <thead>
           <tr>
@@ -162,6 +168,7 @@ export const MultiShareSecretsForm = ({ isPublic, secrets }: Props) => {
                           {...field}
                           placeholder="API Key"
                           type="text"
+                          className = 'overflow-scroll'
                         />
                       </FormControl>
                     )}
@@ -182,7 +189,9 @@ export const MultiShareSecretsForm = ({ isPublic, secrets }: Props) => {
                         {...field}
                         placeholder="Enter sensitive data to share..."
                         type="text"
+                        className = 'overflow-scroll'
                         isReadOnly
+                        isRequired
                       />
                     </FormControl>
                   )}
